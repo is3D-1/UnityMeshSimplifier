@@ -405,7 +405,7 @@ namespace UnityMeshSimplifier
         /// <returns>The string.</returns>
         public override string ToString()
         {
-            return string.Format("({0:F1}, {1:F1}, {2:F1})", x, y, z);
+            return string.Format("({0:F3}, {1:F3}, {2:F3})", x, y, z);
         }
 
         /// <summary>
