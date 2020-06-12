@@ -28,7 +28,7 @@ using System.Runtime.CompilerServices;
 
 namespace UnityMeshSimplifier.Internal
 {
-    internal struct Ref
+    internal class Ref
     {
         public int tid;
         public int tvertex;
@@ -38,6 +38,11 @@ namespace UnityMeshSimplifier.Internal
         {
             this.tid = tid;
             this.tvertex = tvertex;
+        }
+
+        public override string ToString()
+        {
+            return string.Format("Ref({0}, {1})", tid, tvertex);
         }
     }
 }

@@ -1170,6 +1170,7 @@ namespace UnityMeshSimplifier
             // Write References
             this.refs.Resize(tstart);
             var refs = this.refs.Data;
+            Ref r;
             for (int i = 0; i < triangleCount; i++)
             {
                 int v0 = triangles[i].v0;
@@ -1181,10 +1182,15 @@ namespace UnityMeshSimplifier
                 int count1 = vertices[v1].tcount++;
                 int start2 = vertices[v2].tstart;
                 int count2 = vertices[v2].tcount++;
-
-                refs[start0 + count0].Set(i, 0);
-                refs[start1 + count1].Set(i, 1);
-                refs[start2 + count2].Set(i, 2);
+                r = new Ref();
+                r.Set(i, 0);
+                refs[start0 + count0] = r;
+                r = new Ref();
+                r.Set(i, 1);
+                refs[start1 + count1] = r;
+                r = new Ref();
+                r.Set(i, 2);
+                refs[start2 + count2] = r;
             }
         }
         #endregion
