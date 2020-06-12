@@ -29,13 +29,16 @@ using System.Runtime.CompilerServices;
 
 namespace UnityMeshSimplifier.Internal
 {
-    internal struct Vertex : IEquatable<Vertex>
+    internal class Vertex : IEquatable<Vertex>
     {
         public int index;
         public Vector3d p;
         public int tstart;
         public int tcount;
+        public int estart;
+        public int ecount;
         public SymmetricMatrix q;
+        public SymmetricMatrix qPenaltyEdge; // quadric error matrix for preserving all edges type (border, seams, etc)
         public bool borderEdge;
         public bool uvSeamEdge;
         public bool uvFoldoverEdge;
@@ -47,7 +50,10 @@ namespace UnityMeshSimplifier.Internal
             this.p = p;
             this.tstart = 0;
             this.tcount = 0;
-            this.q = new SymmetricMatrix();
+            this.estart = 0;
+            this.ecount = 0;
+            this.q = new SymmetricMatrix(0);
+            this.qPenaltyEdge = new SymmetricMatrix(0);
             this.borderEdge = true;
             this.uvSeamEdge = false;
             this.uvFoldoverEdge = false;
@@ -73,5 +79,11 @@ namespace UnityMeshSimplifier.Internal
         {
             return index == other.index;
         }
+
+        public override string ToString()
+        {
+            return string.Format("v{0} ({1:F3}, {2:F3}, {3:F3}) {4} tris", index, p.x,p.y,p.z, tcount);
+        }
+
     }
 }
