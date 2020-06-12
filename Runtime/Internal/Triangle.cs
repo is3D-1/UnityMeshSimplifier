@@ -29,7 +29,7 @@ using System.Runtime.CompilerServices;
 
 namespace UnityMeshSimplifier.Internal
 {
-    internal struct Triangle : IEquatable<Triangle>
+    internal class Triangle : IEquatable<Triangle>
     {
         #region Fields
         public int index;
@@ -50,7 +50,10 @@ namespace UnityMeshSimplifier.Internal
 
         public bool deleted;
         public bool dirty;
+        public Ref refCached;
+
         public Vector3d n;
+        public Vector3d nCached;
         #endregion
 
         #region Properties
@@ -100,6 +103,8 @@ namespace UnityMeshSimplifier.Internal
             err0 = err1 = err2 = err3 = 0;
             deleted = dirty = false;
             n = new Vector3d();
+            nCached = n;
+            refCached = new Ref(); // refs for v0, v1 and v2
         }
         #endregion
 
@@ -132,6 +137,27 @@ namespace UnityMeshSimplifier.Internal
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public int GetAttributeIndex(int index)
+        {
+            int value;
+            switch (index)
+            {
+                case 0:
+                    value = va0;
+                    break;
+                case 1:
+                    value = va1;
+                    break;
+                case 2:
+                    value = va2;
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(index));
+            }
+            return value;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void GetErrors(double[] err)
         {
             err[0] = err0;
@@ -159,6 +185,12 @@ namespace UnityMeshSimplifier.Internal
         {
             return index == other.index;
         }
+
+        public override string ToString()
+        {
+            return string.Format("t{0} ({1}, {2}, {3}){4}", index, v0, v1, v2, deleted ? " deleted" : "");
+        }
+
         #endregion
     }
 }
