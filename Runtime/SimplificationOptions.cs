@@ -1,4 +1,4 @@
-﻿#region License
+#region License
 /*
 MIT License
 
@@ -47,7 +47,8 @@ namespace UnityMeshSimplifier
             PreserveUVFoldoverEdges = false,
             PreserveSurfaceCurvature = false,
             EnableSmartLink = true,
-            VertexLinkDistance = double.Epsilon,
+            VertexLinkDistance = 0.0005,
+            UseSortedEdgeMethod = true,
             MaxIterationCount = 100,
             Agressiveness = 7.0
         };
@@ -91,6 +92,14 @@ namespace UnityMeshSimplifier
         /// </summary>
         [Tooltip("The maximum distance between two vertices in order to link them.")]
         public double VertexLinkDistance;
+        /// <summary>
+        /// Allows to use a simplification algorithm that collapse edges from an sorted edge list
+        /// by increasing order of error.
+        /// Default value: true
+        /// </summary>
+        [Tooltip("Use the sorted edge list algorithm instead of the fast quadrics. This algorithm uses a different mecanism to preserve borders and edges. It allows high reduction ratio while retaining a good quality.")]
+        public bool UseSortedEdgeMethod;
+
         /// <summary>
         /// The maximum iteration count. Higher number is more expensive but can bring you closer to your target quality.
         /// Sometimes a lower maximum count might be desired in order to lower the performance cost.
