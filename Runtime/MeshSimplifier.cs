@@ -1097,7 +1097,7 @@ namespace UnityMeshSimplifier
                 // but mostly improves the result for closed meshes
                 for (int i = 0; i < vertexCount; i++)
                 {
-                    vertices[i].q = new SymmetricMatrix();
+                    vertices[i].q = new SymmetricMatrix(0);
                 }
 
                 int v0, v1, v2;
@@ -2373,5 +2373,100 @@ namespace UnityMeshSimplifier
         }
         #endregion
         #endregion
+    }
+
+    // a singleton to collect stats on algo flow
+    internal class DebugMeshPerf
+    {
+        public int nrErrorEval = 0;
+        public int nrEdgeReinsert = 0;
+        public int nrLoopTest = 0;
+        public int nrLoopComplete = 0;
+        public int nrErrorTypeEllipsoid = 0;
+        public int nrErrorTypeVertex = 0;
+        public int nrBorder2D = 0;
+        public int nrUVSeamEdge = 0;
+        public int nrUVFoldoverEdge = 0;
+        public int nrEdgeLag = 0;
+        public int nrEdgeRejected = 0;
+        public int nrTrisBefore = 0;
+        public int nrTrisAfter = 0;
+        public double lastErrorValue = 0;
+        public int[] Triplets = new int[3];
+
+        private DebugMeshPerf() { }
+
+        public void Reset()
+        {
+            singleton = new DebugMeshPerf();
+        }
+
+        private static DebugMeshPerf singleton;
+
+        public static DebugMeshPerf Data
+        {
+            get
+            {
+                if (singleton == null)
+                    singleton = new DebugMeshPerf();
+                return singleton;
+            }
+        }
+
+        public override string ToString()
+        {
+            return string.Format(
+                "Tris before = {0}, tris after = {1}, Error = {2}" +
+                "\nMainloop(Lag:{3}, Rejected:{4} ErrorQEval:{5}, Reinsert:{6}, Loop:{7}, DeletedEdges:{8})" +
+                "\nErrorQProfil(Ellipse:{9},Vertex:{10})" +
+                "\nBorder 2D edges:{11}, UVSeamEdges:{12}, UVFoldoverEdges:{13}" +
+                "\nEigenValue: {14};{15};{16}"
+                , nrTrisBefore, nrTrisAfter, lastErrorValue
+                , nrEdgeLag, nrEdgeRejected, nrErrorEval, nrEdgeReinsert, nrLoopTest, nrLoopComplete
+                , nrErrorTypeEllipsoid, nrErrorTypeVertex
+                , nrBorder2D, nrUVSeamEdge, nrUVFoldoverEdge
+                , Triplets[0], Triplets[1], Triplets[2]);
+        }
+
+        /// <summary>
+        /// Quadrics error display.
+        /// This function will add a color at  each vertex to create a heat map representing quadrics error.
+        /// Use a Particles/Standard unlit shader set to Opaque/Color to display the heat map.
+        /// </summary>
+        /// <param name="vertices"></param>
+        /// <param name="v2e"></param>
+        /// <returns></returns>
+        public static Color[] UpdateVertexColor(Vertex[] vertices, Edge[] v2e)
+        {
+            Color colorErrorSmall = Color.green;
+            Color colorErrorLarge = Color.yellow;
+            Color[] colors = new Color[vertices.Length];
+            Vertex v;
+            Edge e;
+            for (int i = 0; i < vertices.Length; i++)
+            {
+                v = vertices[i];
+                double errTrace, err = 0, errMax = 0, errMin = double.MaxValue, errAvg = 0;
+                if (v.ecount > 0)
+                {
+                    for (int j = 0; j < v.ecount; j++)
+                    {
+                        e = v2e[v.estart + j];
+                        err = e.error;
+                        errAvg += err;
+                        errMin = Math.Min(errMin, err);
+                        errMax = Math.Max(errMax, err);
+                    }
+                    errAvg /= v.ecount;
+                }
+                // display the error max at vertex
+                if (errMin > 0)
+                    errTrace = (-Math.Log10(errMin) + 1) / 10;
+                else
+                    errTrace = 1;
+                colors[i] = Color.Lerp(colorErrorLarge, colorErrorSmall, Mathf.Clamp01((float)errTrace));
+            }
+            return colors;
+        }
     }
 }
