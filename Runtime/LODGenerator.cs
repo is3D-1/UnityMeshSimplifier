@@ -598,14 +598,7 @@ namespace UnityMeshSimplifier
         private static Mesh SimplifyMesh(Mesh mesh, float quality, SimplificationOptions options)
         {
             var meshSimplifier = new MeshSimplifier();
-            meshSimplifier.PreserveBorderEdges = options.PreserveBorderEdges;
-            meshSimplifier.PreserveUVSeamEdges = options.PreserveUVSeamEdges;
-            meshSimplifier.PreserveUVFoldoverEdges = options.PreserveUVFoldoverEdges;
-            meshSimplifier.PreserveSurfaceCurvature = options.PreserveSurfaceCurvature;
-            meshSimplifier.EnableSmartLink = options.EnableSmartLink;
-            meshSimplifier.VertexLinkDistance = options.VertexLinkDistance;
-            meshSimplifier.MaxIterationCount = options.MaxIterationCount;
-            meshSimplifier.Agressiveness = options.Agressiveness;
+            meshSimplifier.SimplificationOptions = options;
             meshSimplifier.Initialize(mesh);
             meshSimplifier.SimplifyMesh(quality);
 
